@@ -18,7 +18,13 @@ def record_rating():
         st.session_state.last_rating = current
 
 
-st.title("▶ Emotion‑Rating Video Player")
+st.image(
+    "https://media.licdn.com/dms/image/v2/D4D0BAQEL_RCJAemS_w/company-logo_200_200/company-logo_200_200/0/1726498371243/brainvivo_logo?e=1744848000&v=beta&t=XiSuWtr_S4LdYCnTF_AoZRKlx6FBIQ94sjDiL39rGnE",
+    width=100,
+    caption="",
+)
+
+st.title("Emotion Rating")
 
 uploaded_file = st.file_uploader("Upload a video", type=["mp4", "mov", "avi"])
 if uploaded_file:
