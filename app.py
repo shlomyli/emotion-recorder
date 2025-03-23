@@ -18,6 +18,11 @@ def record_rating():
         st.session_state.last_rating = current
 
 
+def start_edit():
+    st.session_state.edit_mode = True
+    st.session_state.editable_df = st.session_state.df_ratings.copy()
+
+
 st.image(
     "https://media.licdn.com/dms/image/v2/D4D0BAQEL_RCJAemS_w/company-logo_200_200/company-logo_200_200/0/1726498371243/brainvivo_logo?e=1744848000&v=beta&t=XiSuWtr_S4LdYCnTF_AoZRKlx6FBIQ94sjDiL39rGnE",
     width=100,
@@ -38,6 +43,10 @@ if uploaded_file:
         st.session_state.playing = False
         st.session_state.ratings = []
         st.session_state.last_rating = None
+        st.session_state.show_editor = False
+        st.session_state.df_ratings = None
+        st.session_state.edit_mode = False
+        st.session_state.editable_df = None
 
     # Display the video
     st.video(uploaded_file)
@@ -61,15 +70,23 @@ if uploaded_file:
 
         # Show & download ratings
         if st.session_state.ratings:
-            df = pd.DataFrame(
+            st.session_state.df_ratings = pd.DataFrame(
                 st.session_state.ratings, columns=["timestamp (s)", "rating"]
             )
             st.write("### Recorded Ratings")
-            st.dataframe(df)
-            csv = df.to_csv(index=False).encode()
+            st.dataframe(st.session_state.df_ratings)
+            st.button("Edit/Download", on_click=start_edit)
+
+        if st.session_state.edit_mode:
+            edited = st.data_editor(
+                st.session_state.editable_df,
+                use_container_width=True,
+                num_rows="dynamic",
+            )
+
+            # Download the edited table
+            csv = edited.to_csv(index=False).encode("utf-8")
+            filename = uploaded_file.name.rsplit(".", 1)[0] + "_ratings.csv"
             st.download_button(
-                "Download CSV",
-                data=csv,
-                file_name=f"{uploaded_file.name.rsplit('.',1)[0]}.csv",
-                mime="text/csv",
+                "Download CSV", data=csv, file_name=filename, mime="text/csv"
             )
